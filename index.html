@@ -359,10 +359,9 @@
             const submitBtn = document.getElementById('submitBtn');
             const form = document.getElementById('appointmentForm');
 
-            // Validation
             if (!form.name.value || !form.phone.value || !form.service.value || !form.date.value || !form.time.value) {
                 document.getElementById('confirmationMessage').innerHTML = "Please fill all the fields.";
-                return; // Stop execution if validation fails
+                return;
             }
 
             submitBtn.disabled = true;
@@ -377,7 +376,7 @@
             };
 
             try {
-                const response = await fetch('http://localhost:3000/api/appointments', {
+                const response = await fetch('/api/appointments', { // ✅ updated
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -405,14 +404,10 @@
 
         function submitContact() {
             const form = document.getElementById('contactForm');
-
-            // Validation
             if (!form.contactName.value || !form.email.value || !form.contactPhone.value || !form.message.value) {
                 document.getElementById('contactConfirmation').innerHTML = "Please fill all the fields.";
-                return; // Stop execution if validation fails
+                return;
             }
-
-            // Here you'll need to add code to send data to your backend
             document.getElementById('contactConfirmation').innerHTML =
                 "Thank you for your message! We'll respond within 24 hours.";
             form.reset();
@@ -420,14 +415,10 @@
 
         function submitFeedback() {
             const form = document.getElementById('feedbackForm');
-
-            // Validation
             if (!form.feedbackName.value || !form.feedbackEmail.value || !form.feedbackMessage.value) {
                 document.getElementById('feedbackConfirmation').innerHTML = "Please fill all the fields.";
-                return; // Stop execution if validation fails
+                return;
             }
-
-            // Here you'll need to add code to send data to your backend
             document.getElementById('feedbackConfirmation').innerHTML =
                 "Thank you for your feedback! We'll respond within 24 hours.";
             form.reset();
@@ -439,10 +430,8 @@
             document.getElementById('appointment').scrollIntoView();
         }
 
-        // Coupon Code Function
         function applyCoupon() {
             var couponCode = document.getElementById("couponCode").value;
-            // Validate coupon code (this is just an example)
             if (couponCode === "DISCOUNT10") {
                 document.getElementById("couponMessage").innerHTML = "Coupon applied! You get a 10% discount.";
             } else {
