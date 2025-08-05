@@ -2,32 +2,26 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path');
 
 const app = express();
 const PORT = 3000;
 
-// Middleware
-app.use(cors({
-    origin: 'http://127.0.0.1:3001', // Yahan aap apne frontend ka URL daal sakte hain
-    methods: ['GET', 'POST'], // Allowed methods
-    allowedHeaders: ['Content-Type'] // Allowed headers
-}));
+// ✅ CORS — sab origin allow
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// MongoDB connection URL
-const url = 'mongodb://localhost:27017/beauty_parlour'; // Your database name
+// ✅ Static files serve (frontend folder)
+app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Connect to MongoDB using Mongoose
+// ✅ MongoDB connection
+const url = 'mongodb://localhost:27017/beauty_parlour';
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log('Connected to MongoDB');
-    })
-    .catch(err => {
-        console.error('Error connecting to MongoDB:', err);
-    });
+    .then(() => console.log('✅ Connected to MongoDB'))
+    .catch(err => console.error('❌ Error connecting to MongoDB:', err));
 
-// Define your Mongoose schemas and models here
+// ✅ Schema & Model
 const appointmentSchema = new mongoose.Schema({
     name: String,
     phone: String,
@@ -35,31 +29,34 @@ const appointmentSchema = new mongoose.Schema({
     date: Date,
     time: String
 });
-
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
-// Root route
+// ✅ Root Route
 app.get('/', (req, res) => {
-    res.send('Welcome to the Beauty Parlour API!'); // Simple response for root URL
+    res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
 
-// Endpoint to handle appointment submission
+// ✅ Appointment Booking API
 app.post('/api/appointments', (req, res) => {
-    const appointmentData = req.body; // Get the appointment data from the form
-    console.log('Appointment Data:', appointmentData); // Log it to the console
+    const appointmentData = req.body;
+    console.log('📅 Appointment Data Received:', appointmentData);
+
     const newAppointment = new Appointment(appointmentData);
 
     newAppointment.save()
         .then(() => {
-            res.json({ message: 'Appointment booked successfully!', data: appointmentData });
+            res.json({
+                message: 'Appointment booked successfully!',
+                data: appointmentData
+            });
         })
         .catch(err => {
-            console.error('Error saving appointment:', err);
+            console.error('❌ Error saving appointment:', err);
             res.status(500).json({ message: 'Error booking appointment.' });
         });
 });
 
-// Start the server
+// ✅ Start Server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`🚀 Backend running at http://localhost:${PORT}`);
 });
