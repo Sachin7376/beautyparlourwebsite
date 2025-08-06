@@ -12,9 +12,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// ✅ Static files serve (frontend folder)
-app.use(express.static(path.join(__dirname, '../frontend')));
-
 // ✅ MongoDB connection
 const url = 'mongodb://localhost:27017/beauty_parlour';
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -31,9 +28,13 @@ const appointmentSchema = new mongoose.Schema({
 });
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
-// ✅ Root Route
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+// ✅ Static files serve from frontend
+const frontendPath = path.join(__dirname, '../frontend');
+app.use(express.static(frontendPath));
+
+// ✅ Optional: Redirect old URL (/frontend/index.html) to new root
+app.get('/frontend/index.html', (req, res) => {
+    res.redirect('/index.html');
 });
 
 // ✅ Appointment Booking API
@@ -54,6 +55,11 @@ app.post('/api/appointments', (req, res) => {
             console.error('❌ Error saving appointment:', err);
             res.status(500).json({ message: 'Error booking appointment.' });
         });
+});
+
+// ✅ Fallback Route (Fix for Express 5 / Node v22+)
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // ✅ Start Server
